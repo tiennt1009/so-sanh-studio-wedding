@@ -411,10 +411,15 @@ const STUDIOS = [
     website: null, facebook: null, instagram: null, phone: null,
     area: null,
     styles: [],
-    priceFrom: null, priceTo: null,
-    packages: [],
-    outfits: null, retouched: null, album: null, makeup: null,
-    locations: null,
+    priceFrom: 9.99, priceTo: 14.99,
+    packages: [
+      { name: "Studio Đặc biệt", price: 9.99, includes: "Chụp tại studio độc quyền Harmony, không phát sinh phí thuê phim trường · Chọn 3 concept bất kỳ tại studio · 2 trang phục tự chọn (tại showroom hoặc tự chuẩn bị) · Trang điểm, làm tóc cô dâu · Toàn bộ file gốc + 20 file chỉnh sửa chi tiết, 1 slide HD Basic · 2 ảnh phóng 60x90, 2 ảnh bàn 15x21 (lusterfilm ép gỗ laminate) · Quà ngày cưới (5 ngày liên tiếp): thuê 1 váy dòng Luxury (giá thuê ngoài gói 8 triệu), 1 vest cao cấp, 1 cặp áo dài ăn hỏi · 1 ekip chỉ phục vụ 1 cặp đôi · Chỉ lấy file chỉnh sửa, không in: giảm 5% giá gói" },
+      { name: "Studio Luxury", price: 12.99, includes: "Chụp tại studio độc quyền Harmony, không phát sinh phí thuê phim trường · Chọn 5 concept bất kỳ tại studio · 3 trang phục tự chọn (tại showroom hoặc tự chuẩn bị) · Trang điểm, làm tóc cô dâu · Toàn bộ file gốc + 40 file chỉnh sửa chi tiết, 1 slide HD Basic · 2 ảnh phóng 60x90, 4 ảnh bàn 15x21 (lusterfilm ép gỗ laminate) · Album 20x30 30 trang (hoặc 7 ảnh bàn 15x21) · Quà ngày cưới (5 ngày liên tiếp): thuê 1 váy dòng Luxury (giá thuê ngoài gói 8 triệu), 1 vest cao cấp, 1 cặp áo dài ăn hỏi · 1 ekip chỉ phục vụ 1 cặp đôi · Chỉ lấy file chỉnh sửa, không in: giảm 5% giá gói" },
+      { name: "Ngoại cảnh Lux 1", price: 12.99, includes: "Chọn 2 trong 3: studio độc quyền Harmony, địa điểm bất kỳ nội thành Hà Nội, phim trường bất kỳ nội thành Hà Nội · Tặng 500K phí vào cổng phim trường · 3 trang phục tự chọn (tại showroom hoặc tự chuẩn bị) · Trang điểm, làm tóc cô dâu · Toàn bộ file gốc + 35 file chỉnh sửa chi tiết, 1 slide HD Basic · 2 ảnh phóng 60x90, 3 ảnh bàn 15x21 (lusterfilm ép gỗ laminate) · Album 20x30 20 trang (hoặc 5 ảnh bàn 15x21) · Quà ngày cưới (5 ngày liên tiếp): thuê 1 váy dòng Luxury (giá thuê ngoài gói 8 triệu), 1 vest cao cấp, 1 cặp áo dài ăn hỏi · 1 ekip chỉ phục vụ 1 cặp đôi · Chỉ lấy file chỉnh sửa, không in: giảm 5% giá gói" },
+      { name: "Ngoại cảnh Lux 2", price: 14.99, includes: "Chọn 2 trong 3: studio độc quyền Harmony, địa điểm bất kỳ nội thành Hà Nội, phim trường bất kỳ nội thành Hà Nội · Tặng 500K phí vào cổng phim trường · 3 trang phục tự chọn (tại showroom hoặc tự chuẩn bị) · Trang điểm, làm tóc cô dâu · Toàn bộ file gốc + 50 file chỉnh sửa chi tiết, 1 slide HD Basic · 2 ảnh phóng 60x90, 8 ảnh bàn 15x21, 3 ảnh bàn 20x30 (lusterfilm ép gỗ laminate) · Album 20x30 30 trang (hoặc 7 ảnh bàn 15x21) · Tặng 1 ảnh phóng thiết kế 60x90 · Quà ngày cưới (5 ngày liên tiếp): thuê 1 váy dòng Luxury (giá thuê ngoài gói 8 triệu), 1 vest cao cấp, 1 cặp áo dài ăn hỏi · 1 ekip chỉ phục vụ 1 cặp đôi · Chỉ lấy file chỉnh sửa, không in: giảm 5% giá gói" }
+    ],
+    outfits: "2 – 3 bộ tự chọn", retouched: "20 – 50 file + toàn bộ file gốc", album: "20x30, 20 – 30 trang (gói Studio Đặc biệt không có album)", makeup: "Có (cô dâu, tại buổi chụp)",
+    locations: "Gói Studio: studio độc quyền Harmony · Gói Ngoại cảnh: 2 trong 3 (studio, điểm nội thành, phim trường)",
     delivery: null, deposit: null, contact: null,
     rating: null,
     albums: [
@@ -447,13 +452,15 @@ const STUDIOS = [
   {
     id: "rose",
     name: "Rosé Studio",
-    website: null, facebook: null, instagram: null, phone: null,
-    area: null,
+    website: "https://www.rosewedding.vn", facebook: null, instagram: null, phone: null,
+    area: "102 An Trạch, Đống Đa, Hà Nội",
     styles: [],
-    priceFrom: null, priceTo: null,
-    packages: [],
-    outfits: null, retouched: null, album: null, makeup: null,
-    locations: null,
+    priceFrom: 12.8, priceTo: 12.8,
+    packages: [
+      { name: "Package 4", price: 12.8, includes: "2 địa điểm nội thành Hà Nội (studio + phim trường độc quyền và ngoại cảnh), trong 8 giờ · Cô dâu: 2 váy chụp cao cấp + 1 set tự chuẩn bị · Chú rể: 2 bộ vest cao cấp kèm phụ kiện + 1 set tự chuẩn bị · Trang điểm, làm tóc cô dâu theo váy ngày chụp · 1 ekip chỉ phục vụ 1 cặp đôi, chăm sóc xuyên suốt buổi chụp · Toàn bộ file gốc + 40 file photoshop hoàn thiện, 1 video slide Basic · 2 ảnh phóng 60x90 ép gỗ laminate, 2 ảnh để bàn gương 15x21 · Album 20x30 giấy silk 30 trang · Tặng 1 thiệp cưới điện tử (tối đa 2 triệu), 2 clip TikTok (báo trước để sắp xếp ekip) · Book founder chụp: thêm 8 triệu · Chưa gồm phí di chuyển, vé vào điểm chụp (nếu có)" }
+    ],
+    outfits: "Cô dâu 2 váy + 1 set tự chuẩn bị · Chú rể 2 vest + 1 set tự chuẩn bị", retouched: "40 file + toàn bộ file gốc", album: "20x30 giấy silk, 30 trang", makeup: "Có (cô dâu, theo váy ngày chụp)",
+    locations: "2 địa điểm nội thành Hà Nội: studio + phim trường độc quyền và ngoại cảnh",
     delivery: null, deposit: null, contact: null,
     rating: null,
     albums: [
