@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<style>
+  body { font: 14px system-ui, sans-serif; width: 320px; margin: 12px; }
+  label { display: block; margin: 8px 0 3px; font-weight: 600; }
+  input { width: 100%; box-sizing: border-box; padding: 6px; }
+  button { margin-top: 12px; width: 100%; padding: 9px; font-size: 14px; cursor: pointer; }
+  #status { margin-top: 10px; color: #444; min-height: 2.5em; white-space: pre-line; }
+  small { color: #777; }
+</style>
+</head>
+<body>
+  <label for="studio">Tên studio (thư mục trong Anh-cuoi/)</label>
+  <input id="studio" list="studios">
+  <datalist id="studios"></datalist>
+  <div id="hint" style="color:#b5543a;font-size:13px"></div>
+  <label for="album">Tên bộ ảnh (thư mục trong studio)</label>
+  <input id="album">
+  <label for="min">Cạnh dài tối thiểu (px)</label>
+  <input id="min" type="number" value="700">
+  <small>Tăng số này nếu bị lẫn ảnh nhỏ như logo, biểu tượng.</small>
+  <button id="go">Tải ảnh trang này</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

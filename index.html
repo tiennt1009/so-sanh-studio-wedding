@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>So sánh studio ảnh cưới</title>
+<style>
+  :root {
+    --bg: #faf7f4; --card: #fff; --ink: #2b2623; --muted: #7a716b; --line: #e8e1da;
+    --accent: #b5543a; --accent-soft: #f6e6df; --good: #2f7d55; --good-soft: #e3f3ea; --diff: #fff6dc;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button { font: inherit; cursor: pointer; }
+  input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; vertical-align: -3px; }
+
+  header { position: sticky; top: 0; z-index: 20; background: rgba(250,247,244,.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 14px 24px; }
+  h1 { margin: 0 0 10px; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .bar input[type=search] { padding: 9px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font: inherit; min-width: 220px; }
+  .bar input[type=search]:focus, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 13px; font-size: 13px; line-height: 1; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .spacer { flex: 1; }
+  .btn { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 9px 15px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .toggle { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+  .toggle.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  /* dropdown tự dựng, thay cho <select> mặc định */
+  .dd { position: relative; }
+  .dd-btn { display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 9px 14px; font: inherit; white-space: nowrap; }
+  .dd-btn svg { width: 11px; height: 11px; opacity: .6; transition: transform .15s; }
+  .dd.open .dd-btn svg { transform: rotate(180deg); }
+  .dd-list { position: absolute; top: calc(100% + 6px); left: 0; min-width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px rgba(40,25,15,.14); padding: 5px; z-index: 30; display: none; }
+  .dd.open .dd-list { display: block; }
+  .dd-opt { padding: 8px 12px; border-radius: 8px; font-size: 14px; white-space: nowrap; cursor: pointer; }
+  .dd-opt:hover { background: var(--accent-soft); }
+  .dd-opt.sel { font-weight: 700; color: var(--accent); }
+
+  main { padding: 24px; max-width: 1360px; margin: 0 auto; }
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .empty { color: var(--muted); padding: 60px 0; text-align: center; grid-column: 1/-1; }
+  .empty b { display: block; font-size: 16px; margin-bottom: 6px; color: var(--ink); }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: box-shadow .15s, transform .15s; }
+  .card:hover { box-shadow: 0 10px 28px rgba(60,40,30,.10); transform: translateY(-2px); }
+  .cover { position: relative; aspect-ratio: 4/5; background: linear-gradient(135deg, #efe5dc, #e2d3c6); cursor: pointer; overflow: hidden; }
+  .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cover .ph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; text-align: center; padding: 20px; }
+  .cover .ph.spin::before { content: ""; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d8cabd; border-top-color: var(--accent); animation: spin .7s linear infinite; position: absolute; top: 44%; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; padding: 2px 9px; border-radius: 999px; }
+  .albumcount { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,.55); color: #fff; font-size: 12px; padding: 3px 10px; border-radius: 999px; }
+  .star { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); font-size: 20px; line-height: 1; color: #b9afa7; }
+  .star.on { color: #e8a317; }
+  .body { padding: 15px 17px 17px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+  .name { font-size: 17px; font-weight: 700; margin: 0; cursor: pointer; }
+  .name:hover { color: var(--accent); }
+  .meta { color: var(--muted); font-size: 13px; }
+  .price { font-weight: 700; color: var(--accent); }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag { background: var(--accent-soft); color: #8c3b25; font-size: 12px; padding: 2px 9px; border-radius: 999px; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 4px; }
+  .score { font-weight: 700; }
+  .cmpBtn { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px; font-size: 14px; font-weight: 600; }
+  .cmpBtn.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .cmpBtn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ---- trang chi tiết (dialog) ---- */
+  dialog#detail { border: 0; border-radius: 18px; padding: 0; max-width: min(1100px, 96vw); width: 100%; max-height: 94vh; background: var(--bg); color: var(--ink); box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+  dialog#detail::backdrop { background: rgba(30,20,15,.55); }
+  .dhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 22px 26px 8px; }
+  .dhead h2 { margin: 0; font-size: 24px; }
+  .x { border: 0; background: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; flex: none; }
+  .dbody { padding: 8px 26px 26px; overflow: auto; max-height: calc(94vh - 80px); }
+  .links a { color: var(--accent); margin-right: 14px; text-decoration: none; font-size: 14px; }
+  .links a:hover { text-decoration: underline; }
+  h3 { margin: 24px 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  table { border-collapse: collapse; width: 100%; background: #fff; border-radius: 12px; overflow: hidden; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 14px; }
+  th { background: #f3ece5; font-weight: 600; width: 160px; }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  table tbody tr:nth-child(even) th, table tbody tr:nth-child(even) td { background: #faf6f1; }
+  td.best { background: var(--good-soft); color: var(--good); font-weight: 700; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .tabs .chip { padding: 9px 16px; font-size: 14px; min-height: 38px; display: inline-flex; align-items: center; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .gallery img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; border-radius: 10px; cursor: zoom-in; background: #eee; }
+  .note { color: var(--muted); font-size: 13px; }
+  .rate { display: grid; grid-template-columns: 170px 1fr; gap: 6px 14px; align-items: center; background: #fff; border-radius: 12px; padding: 14px 16px; }
+  .rate button { border: 0; background: none; font-size: 24px; color: #cfc6be; padding: 0 2px; }
+  .rate button.on { color: #e8a317; }
+  textarea { width: 100%; min-height: 90px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; resize: vertical; }
+
+  /* ---- trang So sánh: toàn trang, dạng cột — mỗi studio 1 cột, kéo ngang để xem thêm ---- */
+  #compareView { display: none; }
+  #grid, #gridControls { display: none; }
+  body.view-grid #grid { display: grid; }
+  body.view-grid #gridControls { display: flex; }
+  body.view-compare #compareView { display: block; }
+
+  .cmp-topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .cmp-topbar h2 { margin: 0; font-size: 22px; }
+  .cmp-hint { color: var(--muted); font-size: 13px; }
+
+  .cmp-scroll { overflow-x: auto; overflow-y: auto; border: 1px solid var(--line); border-radius: 18px; background: #fff; -webkit-overflow-scrolling: touch; }
+  table.cmp-table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+  .cmp-table th, .cmp-table td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); padding: 13px 15px; vertical-align: top; text-align: left; font-size: 14px; background: #fff; }
+  .cmp-table tr > :last-child { border-right: 0; }
+  .cmp-table thead th { position: sticky; top: 0; z-index: 3; background: #f3ece5; }
+  .cmp-table th.rowlabel, .cmp-table td.rowlabel { position: sticky; left: 0; z-index: 2; background: #f3ece5 !important; font-weight: 600; min-width: 148px; max-width: 148px; }
+  .rowlabel-flex { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .pf-open { border: 0; background: rgba(0,0,0,.08); width: 25px; height: 25px; border-radius: 7px; font-size: 13px; color: var(--muted); flex: none; line-height: 1; }
+  .pf-open:hover { background: var(--accent); color: #fff; }
+  .cmp-table th.corner { left: 0; z-index: 5; min-width: 148px; max-width: 148px; }
+  .cmp-table th.studio-col, .cmp-table td.studio-col { min-width: 300px; max-width: 320px; }
+  .cmp-table tbody tr:nth-child(odd) > td.studio-col { background: #fff; }
+  .cmp-table tbody tr:nth-child(even) > td.studio-col { background: #faf6f1; }
+  .cmp-table td.best { background: var(--good-soft) !important; color: var(--good); font-weight: 700; }
+  .cmp-table th.addcol { min-width: 160px; background: #fbf7f3; text-align: center; vertical-align: middle; }
+  .addcol-btn { border: 1.5px dashed var(--line); background: #fff; border-radius: 12px; padding: 14px 10px; width: 100%; color: var(--muted); font-size: 13px; }
+  .addcol-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cmp-sname { font-size: 16px; font-weight: 700; margin: 0 0 3px; }
+  .cmp-shead-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+  .cmp-x { border: 0; background: rgba(0,0,0,.08); width: 24px; height: 24px; border-radius: 50%; font-size: 13px; line-height: 1; flex: none; color: var(--muted); }
+  .cmp-x:hover { background: var(--accent); color: #fff; }
+  .cmp-smeta { color: var(--muted); font-size: 12.5px; margin: 2px 0 6px; }
+  .cmp-sprice { font-weight: 700; color: var(--accent); font-size: 14.5px; }
+
+  .pgal { display: flex; flex-direction: column; gap: 14px; }
+  .palbums { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip.mini { padding: 8px 14px; font-size: 13.5px; min-height: 36px; display: inline-flex; align-items: center; }
+  .phero { position: relative; aspect-ratio: 4/5; border-radius: 12px; overflow: hidden; background: #eee; cursor: zoom-in; }
+  .phero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .phero .ph.spin::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #d8cabd; border-top-color: var(--accent); animation: spin .7s linear infinite; position: absolute; inset: 0; margin: auto; }
+  .pthumbs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; }
+  .pthumbs img { width: 46px; height: 58px; object-fit: cover; border-radius: 7px; flex: none; cursor: pointer; opacity: .55; border: 2px solid transparent; }
+  .pthumbs img.on { opacity: 1; border-color: var(--accent); }
+  .pcount { font-size: 12px; color: var(--muted); }
+
+  .pkgblock { display: flex; flex-direction: column; gap: 12px; }
+  .pkg-pane { display: none; }
+  .pkg-pane.on { display: block; }
+  .pkg-price { font-weight: 700; color: var(--accent); font-size: 14.5px; margin-bottom: 7px; }
+  .pkg-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; color: var(--ink); }
+  .pkg-list li { line-height: 1.4; }
+
+  /* ---- popup phóng to so sánh ảnh (tập trung vào các dòng concept) ---- */
+  dialog#photoFocus { border: 0; padding: 0; width: 100vw; max-width: 100vw; height: 100vh; max-height: 100vh; margin: 0; background: var(--bg); color: var(--ink); }
+  dialog#photoFocus::backdrop { background: rgba(20,14,10,.6); }
+  .pf-head { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 24px; background: rgba(250,247,244,.97); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .pf-head h2 { margin: 0; font-size: 19px; }
+  .pf-hint { color: var(--muted); font-size: 13px; }
+  .pf-body { padding: 22px 24px 50px; overflow: auto; height: calc(100vh - 66px); }
+  .pf-group { margin-bottom: 34px; }
+  .pf-group h3 { margin: 0 0 14px; font-size: 17px; }
+  .pf-cols { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 8px; }
+  .pf-col { flex: 0 0 340px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 15px; }
+  .pf-col h4 { margin: 0 0 11px; font-size: 15px; }
+  .pf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .pf-grid img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 9px; cursor: zoom-in; display: block; background: #eee; }
+  .pf-empty { color: var(--muted); font-size: 13px; padding: 10px 0; }
+
+  /* ---- lightbox ---- */
+  dialog#lb { max-width: 100vw; width: 100vw; max-height: 100vh; height: 100vh; border-radius: 0; border: 0; padding: 0; background: rgba(15,10,8,.96); }
+  #lb .stage { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  #lb img { max-width: 94vw; max-height: 92vh; object-fit: contain; }
+  #lb .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; border-radius: 50%; border: 0; background: rgba(255,255,255,.15); color: #fff; font-size: 26px; }
+  #lb .prev { left: 18px; } #lb .next { right: 18px; }
+  #lb .x { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,.15); color: #fff; }
+  #lb .count { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; color: #cbbfb6; font-size: 13px; }
+
+  @media (max-width: 640px) {
+    header, main { padding-left: 14px; padding-right: 14px; }
+    .dhead, .dbody { padding-left: 16px; padding-right: 16px; }
+    .rate { grid-template-columns: 1fr; }
+    .cmp-studio { padding: 18px; }
+  }
+</style>
+</head>
+<body class="view-grid">
+
+<header>
+  <h1>So sánh studio ảnh cưới</h1>
+  <div class="bar" id="gridControls">
+    <input type="search" id="q" placeholder="Tìm studio, khu vực, phong cách...">
+    <div class="dd" id="sortDD">
+      <button type="button" class="dd-btn" id="sortBtn">
+        <span id="sortLabel">Sắp xếp: Tên</span>
+        <svg viewBox="0 0 12 8" fill="currentColor"><path d="M1 1l5 5 5-5"/></svg>
+      </button>
+      <div class="dd-list" id="sortList"></div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <button class="toggle" id="onlyShort" type="button">★ Chỉ shortlist</button>
+    <span class="spacer"></span>
+    <button class="btn" id="cmpAllBtn">So sánh tất cả</button>
+    <button class="btn primary" id="cmpBtn" disabled>So sánh (0)</button>
+  </div>
+  <div class="bar" id="cmpBarBack" style="display:none">
+    <button class="btn" id="backBtn">← Quay lại danh sách</button>
+  </div>
+</header>
+
+<main>
+  <div id="grid"></div>
+  <div id="compareView"></div>
+</main>
+
+<dialog id="detail"></dialog>
+<dialog id="photoFocus">
+  <div class="pf-head">
+    <div><h2 id="pfTitle">So sánh ảnh theo concept</h2><div class="pf-hint">Bấm ảnh để xem toàn màn hình</div></div>
+    <button class="x" id="pfClose" aria-label="Đóng">✕</button>
+  </div>
+  <div class="pf-body" id="pfBody"></div>
+</dialog>
+<dialog id="lb">
+  <div class="stage">
+    <button class="x" id="lbClose" aria-label="Đóng">✕</button>
+    <button class="nav prev" id="lbPrev" aria-label="Ảnh trước">‹</button>
+    <img id="lbImg" alt="">
+    <button class="nav next" id="lbNext" aria-label="Ảnh sau">›</button>
+    <div class="count" id="lbCount"></div>
+  </div>
+</dialog>
+
+<script src="photos.js"></script>
+<script>
+/* =====================================================================
+   DỮ LIỆU STUDIO — chỉ cần sửa phần này (hoặc nhờ Claude cập nhật).
+   Cách thêm studio: copy một khối { ... } rồi sửa. Trường nào chưa biết thì để null.
+   Giá tính theo TRIỆU ĐỒNG (priceFrom / priceTo).
+   Ảnh: dùng extension "Tải ảnh album", ảnh nằm ở <folder>/01.jpg, 02.jpg...
+   Đặt file index.html này trong thư mục chứa các thư mục ảnh (ví dụ Anh-cuoi).
+   Mỗi album ghi đúng tên thư mục con. Trang tự đếm số ảnh trong thư mục.
+   ===================================================================== */
+const STUDIOS = [
+  {
+    id: "pixel",
+    name: "Pixel Photography & Filming",
+    website: "https://www.pixelstudio.vn/album-anh-cuoi",
+    facebook: "https://www.facebook.com/100044305425329", instagram: "https://www.instagram.com/pixelstudio.vn", phone: "097 119 91 50",
+    area: "Tầng 8, 344 phố Minh Khai, quận Hai Bà Trưng, Hà Nội",
+    styles: [],
+    priceFrom: 7.99, priceTo: 29.99,
+    packages: [
+      { name: "Essential Hà Nội", price: 11.99, includes: "Album 25x35/26 trang · 1 ảnh phóng 60x90, 2 ảnh để bàn 20x30 · 2 váy cưới/áo dài, 1 vest · 1 nhiếp ảnh gia + 1 trợ lý · USB slide, trả file gốc" },
+      { name: "Signature Hà Nội", price: 14.9, includes: "Album thiết kế riêng 25x35/30 trang · 2 ảnh phóng 60x90, 2 ảnh để bàn 20x30 · 2 váy cưới + 1 áo dài, 1 vest · 2 nhiếp ảnh gia · USB slide, trả file gốc & file thiết kế" },
+      { name: "Story Hà Nội", price: 17.9, includes: "Có video prewedding · Album riêng 25x35/32 trang · 2 ảnh phóng 60x90, 2 ảnh để bàn 20x30 · 2 váy cưới + 1 áo dài, 1 vest · 2 nhiếp ảnh gia + 1 quay phim" },
+      { name: "Các gói khác", price: "7.9 – 29.99", includes: "Easy 1/2 (bán ngày), Exclusive, Exclusive+, Premium, Ultimate — xem chi tiết trên website" }
+    ],
+    outfits: "1 – 3 (tuỳ gói)", retouched: null, album: "Có, 25x35 (26–32 trang tuỳ gói)", makeup: "Có, đi cùng ekip",
+    locations: "Hà Nội, Đà Lạt, Đà Nẵng - Hội An, Sapa, Tam Đảo, Ba Vì, Mộc Châu, Lý Sơn, Thổ Nhĩ Kỳ (theo các album mẫu)",
+    delivery: null, deposit: null, contact: "097 119 91 50 · pixelstudio.vn@gmail.com",
+    rating: "92% hài lòng (395 đánh giá) trên Facebook",
+    albums: [
+      { name: "Love is choosing you every day", folder: "pixel-photography/love-is-choosing-you-every-day-from", tags: { basic: "1-7" } },
+      { name: "Giữa một Hà Nội dịu dàng vào thu, hồ đã cổ", folder: "pixel-photography/giua-mot-ha-noi-diu-dang-vao-thu-ho-da-co", tags: { aodai_out: "1-10" } },
+      { name: "Chúng ta gặp nhau vào một ngày đẹp trời và kể...", folder: "pixel-photography/chung-ta-gap-nhau-vao-mot-ngay-dep-troi-va-ke", tags: { meadow: "1-11" } }
+    ]
+  },
+  {
+    id: "simplevows",
+    name: "SimpleVows Studio",
+    website: null, facebook: "https://www.facebook.com/simplevows.studio", instagram: "https://www.instagram.com/simplevows.studio", tiktok: "https://www.tiktok.com/@simplevows", phone: "0865586903",
+    area: null,
+    styles: [],
+    priceFrom: 11.8, priceTo: 12.8,
+    packages: [
+      { name: "Basic", price: 11.8, includes: "Chụp tại studio SimpleVows · 2 váy + 2 vest · Make up + làm tóc, hoa lụa cầm tay · 2 ảnh phóng gỗ laminate 60x90, 2 ảnh bàn 15x21 · Album photobook 20x30, 20 trang · Slideshow 15–20 phút · Ekip: 1 photo + 1 make up + 1 support · Giờ chụp: sáng 7h–12h, chiều 13h–18h · Chưa gồm phí di chuyển, vé vào địa điểm" },
+      { name: "Signature", price: 12.8, includes: "1 điểm nội thành Hà Nội + studio SimpleVows · 2 váy + 2 vest · Make up + làm tóc, hoa lụa cầm tay · 2 ảnh phóng gỗ laminate 60x90, 2 ảnh bàn 15x21 · Album photobook 20x30, 20 trang · Slideshow 15–20 phút · Ekip: 1 photo + 1 make up + 1 support · Giờ chụp: sáng 6h–12h, chiều 12h–18h · Chưa gồm phí di chuyển, vé vào địa điểm" }
+    ],
+    outfits: "2 váy + 2 vest", retouched: null, album: "Photobook 20x30, 20 trang", makeup: "Có (theo concept / trang phục)",
+    locations: "Studio SimpleVows; gói Signature thêm 1 điểm nội thành Hà Nội",
+    delivery: null, deposit: null, contact: "0865 586 903 · simplevowsstudio2025@gmail.com",
+    rating: "100% hài lòng (11 đánh giá) trên Facebook",
+    albums: [
+      { name: "There was a couple who came for a photoshoot", folder: "simplevows-studio/there-was-a-couple-who-came-for-a-photoshoot", tags: { basic: "1-10" } },
+      { name: "A little glimpse of forever", folder: "simplevows-studio/a-little-glimpse-of-forever", tags: { meadow: "1-16" } },
+      { name: "Somehow forever looks good on you", folder: "simplevows-studio/somehow-forever-looks-good-on-you-a", tags: { basic: "1-5" } },
+      { name: "Some vows are spoken, some are found", folder: "simplevows-studio/some-vows-are-spoken-some-are-found-in-the", tags: { basic: "1-3" } },
+      { name: "Years from now you'll look back", folder: "simplevows-studio/years-from-now-you-ll-look-back-and-realize", tags: { basic: "1-6" } }
+    ]
+  },
+  {
+    id: "semia",
+    name: "Semia Studio",
+    website: null, facebook: "https://www.facebook.com/profile.php?id=61574687543745", instagram: "https://www.instagram.com/Semia.Studio", phone: null,
+    area: "Tầng 3, Tầng 4 số 1E Trần Quang Diệu, Đống Đa, Hà Nội",
+    styles: [],
+    priceFrom: 13.5, priceTo: 13.5, // không tính các gói film (mua thêm)
+    packages: [
+      { name: "Melina", price: 13.5, includes: "2–3 địa điểm, 7h–17h · 3 váy (hoặc 2 váy + 1 đồ thường), 2 vest · Hoa tươi cầm tay + phụ kiện, make up & làm tóc · Album 25x35 giấy silk 30 trang (bìa tạp chí hoặc da) · 2 ảnh 60x90 mica + khung, 4 ảnh bàn 15x21 gỗ laminate · 40 file chỉnh sửa + toàn bộ ảnh gốc · 1 slideshow 1080 HD · Ekip: 1 photo + 1 support + 1 make up · Chưa gồm phí đi lại, vé vào địa điểm" },
+      { name: "Film kèm prewedding", price: 1.5, includes: "Chụp film kèm buổi prewedding · 1 cuộn film (36 kiểu)" },
+      { name: "Máy film 01", price: 3.5, includes: "2 cuộn film (72 kiểu) · Chưa gồm phí đi lại, vé vào địa điểm" },
+      { name: "Máy film 02", price: 4.5, includes: "3 cuộn film (108 kiểu) · Chưa gồm phí đi lại, vé vào địa điểm" }
+    ],
+    outfits: "3 váy (hoặc 2 váy + 1 đồ thường), 2 vest", retouched: "40 file + toàn bộ ảnh gốc", album: "25x35 giấy silk, 30 trang", makeup: "Có, theo trang phục",
+    locations: "2–3 địa điểm (gói Melina)",
+    delivery: null, deposit: null, contact: "semiastudio@gmail.com",
+    rating: null,
+    albums: [
+      { name: "Mỗi cặp đôi đều có tâm trạng và phong cách hình ảnh", folder: "semia-studio/moi-cap-doi-deu-co-tam-trang-va-phong-cach-hinh-anh", tags: { meadow: "1,2,7,8,10,11,13,16-18,21,22", outdoor: "3-6,9,12,14,15,19,20" } },
+      { name: "Ảnh vườn cỏ", folder: "semia-studio/chi-duc-i-c-d-semia-studio-add-tang-3-4", tags: { meadow: "2-14" } },
+      { name: "Không kể chuyện tình yêu bằng những điều quá lớn", folder: "semia-studio/khong-ke-chuyen-tinh-yeu-bang-nhung-dieu-qua-lon", tags: { basic: "2-18" } },
+      { name: "Vẫn là buổi chụp ảnh cưới nhưng với phong cách nhẹ", folder: "semia-studio/van-la-buoi-chup-anh-cuoi-nhung-voi-phong-cach-nhe", tags: { basic: "2-24" } }
+    ]
+  },
+  {
+    id: "chapter",
+    name: "Chapter Wedding Studio",
+    website: null, facebook: null, instagram: null, phone: null,
+    area: null,
+    styles: [],
+    priceFrom: 9.8, priceTo: 12.8,
+    packages: [
+      { name: "Nội thành 1", price: 9.8, includes: "Nửa ngày, 1 địa điểm · Tối đa 2 trang phục · 2 ảnh phóng 60x90, 3 ảnh bàn 15x21 · 40 ảnh chỉnh sửa · 1 album 20 trang, video slide ảnh cưới · Ekip: 1 chụp + 1 support + 1 make up · Chưa gồm VAT, phí di chuyển, phí địa điểm · Thêm giờ: 1 triệu/giờ" },
+      { name: "Nội thành 2", price: 12.8, includes: "1 ngày, tối đa 2 địa điểm · 2 váy + 2 vest, 1 đồ thường (tự chuẩn bị) · 2 ảnh phóng 60x90, 5 ảnh bàn 15x21 · 50 ảnh chỉnh sửa · 1 album 30 trang, video slide ảnh cưới · Ekip: 1 chụp + 1 support + 1 make up · Chưa gồm VAT, phí di chuyển, phí địa điểm, ăn trưa cho ekip · Thêm giờ: 1 triệu/giờ" }
+    ],
+    outfits: "Tối đa 2 bộ (nửa ngày) · 2 váy + 2 vest + 1 đồ thường (1 ngày)", retouched: "40 – 50 ảnh", album: "20 – 30 trang", makeup: "Có, đi cùng ekip",
+    locations: "Nội thành Hà Nội, 1–2 địa điểm",
+    delivery: null, deposit: null, contact: null,
+    rating: null,
+    albums: [
+      { name: "Chụp cùng thú cưng", folder: "chapter-wedding-studio/chup", tags: { basic: "2-10" } },
+      { name: "Chụp ảnh cưới mùa hè", folder: "chapter-wedding-studio/chup-anh-cuoi-mua-he-khi-studio-tro", tags: { basic: "1-13" } },
+      { name: "Mây tầm", folder: "chapter-wedding-studio/may-tam", tags: { meadow: "1-8" } },
+      { name: "Sen và em", folder: "chapter-wedding-studio/sen-va-em", tags: { aodai_in: "2-6" } }
+    ]
+  },
+  {
+    id: "wedding1989",
+    name: "1989 Wedding Studio",
+    website: "https://1989wedding.com", facebook: null, instagram: null, phone: "088 609 1989",
+    area: null,
+    styles: [],
+    priceFrom: 11.9, priceTo: 12.999,
+    packages: [
+      { name: "Basic 2", price: 12.999, includes: "1–2 điểm nội thành, 5–6 tiếng · Cô dâu và chú rể thay 2 trang phục · Make up & tóc cô dâu, phụ kiện, hoa lụa cầm tay · 2 ảnh phóng 60x90, 1 ảnh bàn 20x30 · Album 20x30 20 trang (hoặc 6 ảnh bàn 15x21) · Toàn bộ file gốc + 30 file chỉnh sửa, 1 slideshow · Ngày cưới: mượn 1 áo dài cặp + 1 váy Lisa Bridal Signature · Chưa gồm phí đi lại, vé vào điểm chụp" },
+      { name: "Diamond 1", price: 11.9, includes: "2–3 điểm nội thành, 7h–17h · Cô dâu và chú rể thay 3 trang phục · Make up & tóc cô dâu, phụ kiện, hoa lụa cầm tay · 2 ảnh phóng 60x90, 1 ảnh bàn 20x30 · Album 20x30 30 trang (hoặc 6 ảnh bàn 15x21 + 2 ảnh 20x30) · Toàn bộ file gốc + 40 file chỉnh sửa, 1 slideshow · Ngày cưới: mượn 1 áo dài cô dâu + 1 váy Lisa Bridal Classic · Chưa gồm phí đi lại, vé vào điểm chụp" }
+    ],
+    outfits: "2 – 3 bộ mỗi người", retouched: "30 – 40 file + file gốc", album: "20x30, 20 – 30 trang (hoặc set ảnh bàn)", makeup: "Có (cô dâu; chú rể hỗ trợ đơn giản)",
+    locations: "1–3 điểm nội thành: studio, phố, công viên Yên Sở, phim trường, quán cafe",
+    delivery: null, deposit: null, contact: "088 609 1989 · 1989weddings@gmail.com",
+    rating: null,
+    albums: [
+      { name: "Ảnh cưới Gen Z đẹp theo cách của riêng", folder: "1989-wedding-studio/anh-cuoi-gen-z-dep-theo-cach-cua-rieng", tags: { meadow: "2-23" } },
+      { name: "Một chiếc váy cưới nhẹ, một bó hoa xanh", folder: "1989-wedding-studio/mot-chiec-vay-cuoi-nhe-mot-bo-hoa-xanh-va", tags: { meadow: "1-27" } },
+      { name: "Phương Anh - Thanh Sơn, một buổi chiều", folder: "1989-wedding-studio/phuong-anh-thanh-son-mot-buoi-chieu", tags: { meadow: "2-16" } },
+      { name: "Concept 4 (ảnh chụp màn hình)", folder: "1989-wedding-studio/concept 4", tags: { aodai_out: "1-2" }, files: ["1795572243499_2217018644394276793_5971953401402466205_10c9bd83d51f57def0feca867f6003eb.jpg", "1795572243654_2217018644394276793_5971953401402466205_a9207ad487612e6af703b43b4b3e6a3c.jpg"] }
+    ]
+  },
+  {
+    id: "seria",
+    name: "Seria Wedding",
+    website: null, facebook: null, instagram: null, phone: null,
+    area: null,
+    styles: [],
+    priceFrom: 8.8, priceTo: 15.5,
+    packages: [
+      { name: "Lily 1", price: 8.8, includes: "Chọn 2 trong 3: studio, phim trường Santorini Park, điểm nội thành · Đã gồm xe đi lại, vé 1 điểm ngoại cảnh · 2 váy cưới + 2 vest, thêm 1 đồ thời trang hoặc áo dài · Ngày cưới: 1 váy dòng Lily, 1 áo dài ăn hỏi cô dâu · 2 ảnh phóng 60x90 gỗ lụa, khung 7 ảnh, 1 ảnh bàn 20x30 · Video slide, file gốc + 30 file chỉnh sửa" },
+      { name: "Lily 2", price: 10.9, includes: "Chọn 2 trong 3: studio, phim trường Santorini Park, điểm nội thành · Đã gồm xe đi lại, vé 1 điểm ngoại cảnh · 2 váy cưới + 2 vest, thêm 1 đồ thời trang hoặc áo dài · Ngày cưới: 1 váy dòng Lily, 1 áo dài ăn hỏi, 1 vest, 5 cặp áo dài đỡ lễ · 2 ảnh phóng 60x90 8K titan, khung 9 ảnh hoặc album 20 trang, 1 ảnh bàn 20x30 · Video slide, file gốc + 30 file chỉnh sửa" },
+      { name: "Peony 1", price: 11.8, includes: "Chọn 2 trong 3: studio, phim trường bất kỳ ở Hà Nội, điểm nội thành · Đã gồm xe đi lại, vé 1 điểm ngoại cảnh · 2 váy cưới + 2 vest, thêm 1 đồ thời trang hoặc áo dài · Ngày cưới: 1 váy dòng Peony, 1 áo dài ăn hỏi cô dâu · 2 ảnh phóng 60x90 gỗ lụa, khung 7 ảnh, 1 ảnh bàn 20x30 · Video slide, file gốc + 30 file chỉnh sửa" },
+      { name: "Peony 2", price: 15.5, includes: "Chọn 2 trong 3: studio, phim trường bất kỳ ở Hà Nội, điểm nội thành · Đã gồm xe đi lại, vé 1 điểm ngoại cảnh · 2 váy cưới + 2 vest, thêm 1 đồ thời trang hoặc áo dài · Ngày cưới: 1 váy dòng Peony, 1 cặp áo dài ăn hỏi, 1 vest, 7 cặp áo dài đỡ lễ · 2 ảnh phóng 60x90 8K titan, khung 9 ảnh hoặc album 20 trang, 1 ảnh bàn 20x30 · Video slide, file gốc + 30 file chỉnh sửa" }
+    ],
+    outfits: "2 váy + 2 vest + 1 đồ thời trang/áo dài", retouched: "30 file + file gốc", album: "Gói 2: album 20 trang hoặc khung 9 ảnh · Gói 1: khung 7 ảnh", makeup: "Có, theo gương mặt và trang phục",
+    locations: "2 trong 3: studio, phim trường, điểm nội thành",
+    delivery: null, deposit: null, contact: null,
+    rating: null,
+    albums: [
+      { name: "A story of us", folder: "seria-wedding/a-story-of-us-khi-tinh-yeu-duoc-ke-bang-nhung", tags: { color: "1-23" } },
+      { name: "Vẫn là bãi cỏ xanh mướt", folder: "seria-wedding/van-la-bai-co-xanh-muot-nhung-la-mot-ngay-rat", tags: { meadow: "1-20" } },
+      { name: "Đằng sau hậu trường 5 triệu view", folder: "seria-wedding/dang-sau-hau-truong-5-trieu-view-la-mot-ekip-co", tags: { meadow: "1-24" } },
+      { name: "Một vẻ đẹp đủ tinh tế", folder: "seria-wedding/mot-ve-dep-du-tinh-te-de-khong-bao-gio-loi-thoi", tags: { color: "1-17" } },
+      { name: "Khi studio trở thành bữa tiệc", folder: "seria-wedding/new-concept-khi-studio-tro-thanh-bua-tiec-cua", tags: { color: "1-28" } },
+      { name: "Behind the scenes", folder: "seria-wedding/behind-the-scenes-quynh-anh-tuan-anh-tu", tags: { basic: "1-11" } }
+    ]
+  },
+  {
+    id: "tiara",
+    name: "Tiara Wedding Studio",
+    website: null, facebook: null, instagram: null, phone: null,
+    area: null,
+    styles: [],
+    priceFrom: 9.2, priceTo: 11.2,
+    packages: [
+      { name: "Standard", price: 9.2, includes: "3 concept tại phim trường Tiara House · 3 váy cưới, 2 vest · Trang điểm, làm tóc, hoa cầm tay, phụ kiện cô dâu · 2 ảnh phóng 60x90 Meka pha lê, khung treo tường 7 chiếc, 1 ảnh bàn 20x30 · Video ảnh lồng nhạc, file gốc & file thiết kế · Ngày cưới: 1 váy Basic, 1 vest, áo dài cặp và áo dài đỡ tráp (dùng 1 lần) · Ngày cưới: 2 lần trang điểm ăn hỏi/tiệc tối, 1 lần ngày cưới" },
+      { name: "Luxury", price: 11.2, includes: "4 concept tại phim trường Tiara House · 3 váy cưới, 3 vest · Trang điểm, làm tóc, hoa cầm tay, phụ kiện cô dâu · 2 ảnh phóng 60x90 Meka pha lê bo hợp kim, khung treo tường 10 chiếc, 1 ảnh bàn 20x30 · Video ảnh lồng nhạc, file gốc & file thiết kế · Ngày cưới: 1 váy Luxury, 1 vest, áo dài cặp và áo dài đỡ tráp (dùng 1 lần) · Ngày cưới: 2 lần trang điểm ăn hỏi/tiệc tối, 1 lần ngày cưới" }
+    ],
+    outfits: "3 váy, 2 – 3 vest", retouched: null, album: "Không ghi album; có khung treo tường 7 – 10 chiếc", makeup: "Có (chụp + ngày cưới)",
+    locations: "Phim trường Tiara House (3 – 4 concept)",
+    delivery: null, deposit: null, contact: null,
+    rating: null,
+    albums: [
+      { name: "Endlessly", folder: "tiara-studio/endlessly-ve-dep-cua-tinh-yeu-vinh-cuu-su-ket", tags: { color: "1-25" } },
+      { name: "Khi ánh sáng trở thành chất liệu", folder: "tiara-studio/khi-anh-sang-tro-thanh-chat-lieu-cua-nghe-thuat", tags: { color: "1-24" } },
+      { name: "Một concept mang sắc xanh", folder: "tiara-studio/mot-concept-mang-sac", tags: { color: "1-24" } },
+      { name: "Sắc nâu", folder: "tiara-studio/sac", tags: { color: "1-15" } },
+      { name: "Nhà có hỷ", folder: "tiara-studio/nha-co-hy-song-hy-by-tiara-studio-co-mot", tags: { aodai_in: "1-16" } }
+    ]
+  },
+  {
+    id: "harmony",
+    name: "Harmony Studio",
+    website: null, facebook: null, instagram: null, phone: null,
+    area: null,
+    styles: [],
+    priceFrom: null, priceTo: null,
+    packages: [],
+    outfits: null, retouched: null, album: null, makeup: null,
+    locations: null,
+    delivery: null, deposit: null, contact: null,
+    rating: null,
+    albums: [
+      { name: "A burgundy affair", folder: "harmony-studio/a-burgundy-affair-harmony-studio-suc-hut-cua", tags: { color: "1-19" } },
+      { name: "Xanh khói", folder: "harmony-studio/xanh-khoi-la-mot-gam-mau-rat-im-nhung-lai-khien-nguoi-ta-muo", tags: { color: "1-16" } },
+      { name: "Album Phương Thảo", folder: "harmony-studio/harmony-studio-da-them-anh-vao-album-phuong-thao", tags: { aodai_in: "1-11", basic: "12-30", meadow: "31-48" } },
+      { name: "A touch of nostalgia", folder: "harmony-studio/a-touch-of-nostalgia-net-tinh-xua-trong-cau", tags: { aodai_in: "1-19" } },
+      { name: "Áo dài, nền xanh rêu", folder: "harmony-studio/bai-viet-20261125-0933", tags: { aodai_in: "1-10" } },
+      { name: "Liên duyên", folder: "harmony-studio/bai-viet-20261125-0934", tags: { aodai_in: "1-11" } },
+      { name: "Một chút Á", folder: "harmony-studio/mot-chut-a-so-8-pho-trung-phung", tags: { aodai_in: "1-8" } }
+    ]
+  }
+];
+
+/* ============================ CODE ============================ */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const t = v => (v == null || v === "") ? '<span class="note">—</span>' : esc(v);
+const CRIT = ["Phong cách ảnh", "Giá", "Tư vấn", "Dịch vụ & hậu kỳ"];
+const EXTS = ["jpg", "jpeg", "png", "webp"];
+// Mỗi ảnh được gắn một nhãn (tags trong albums). Mỗi nhóm trên trang gom một số nhãn.
+const CONCEPTS = [
+  { id: "studio", label: "Trong studio", icon: "🏠", tags: ["basic", "color"] },
+  { id: "outdoor", label: "Ngoại cảnh", icon: "🌳", tags: ["meadow", "outdoor"] },
+  { id: "aodai", label: "Áo dài", icon: "👘", tags: ["aodai_out", "aodai_in"] }, // cứ mặc áo dài thì xếp nhóm này, dù chụp ở đâu
+];
+const MAX_CMP = 12; // bảng so sánh cuộn ngang nên có thể so nhiều studio cùng lúc
+
+/* ---- lưu shortlist / điểm / ghi chú vào trình duyệt ---- */
+const KEY = "wedding-studios-v1";
+let db = {};
+try { db = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
+const st = id => (db[id] ??= { short: false, r: {}, notes: "" });
+function avg(id) {
+  const v = Object.values(st(id).r).filter(Boolean);
+  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length * 10) / 10 : null;
+}
+
+/* ---- ảnh: dò song song (nhanh) thay vì từng ảnh một ---- */
+const enc = f => f.split("/").map(encodeURIComponent).join("/");
+const pad = n => String(n).padStart(2, "0");
+const tryLoad = u => new Promise(res => { const i = new Image(); i.onload = () => res(u); i.onerror = () => res(null); i.src = u; });
+async function probeIndex(folder, n) {
+  const urls = EXTS.map(e => `${enc(folder)}/${pad(n)}.${e}`);
+  const results = await Promise.all(urls.map(tryLoad));
+  return results.find(Boolean) || null;
+}
+const albumCache = new Map(), coverCache = new Map();
+// Bản đưa lên web có sẵn danh sách file (photos.js) nên không phải dò từng ảnh qua mạng.
+const listed = folder => window.PHOTO_FILES?.[folder];
+function albumImages(album) {
+  const folder = album.folder;
+  if (!albumCache.has(folder)) albumCache.set(folder, (async () => {
+    if (listed(folder)) return listed(folder).map(f => `${enc(folder)}/${encodeURIComponent(f)}`);
+    // album có "files" (tên file tự do) thì dùng đúng danh sách đó
+    if (album.files) return (await Promise.all(album.files.map(f => tryLoad(`${enc(folder)}/${encodeURIComponent(f)}`)))).filter(Boolean);
+    const MAX = 60; // dò tối đa 60 số/album, tất cả cùng lúc; số bị thiếu thì bỏ qua
+    const probes = await Promise.all(Array.from({ length: MAX }, (_, i) => probeIndex(folder, i + 1)));
+    return probes.filter(Boolean);
+  })());
+  return albumCache.get(folder);
+}
+/* ---- nhãn concept của từng ảnh: "1-5,8" ---- */
+function parseRanges(text) {
+  const out = new Set();
+  String(text || "").split(",").forEach(part => {
+    const [a, b = a] = part.trim().split("-").map(Number);
+    for (let n = a; n <= b; n++) out.add(n);
+  });
+  return out;
+}
+const albumsFor = (s, tags) => (s.albums || []).filter(a => a.folder && tags.some(x => a.tags?.[x]));
+async function albumPhotos(album, tags) {
+  const imgs = await albumImages(album);
+  // xếp theo thứ tự nhãn: ảnh áo dài ngoại cảnh đứng trước ảnh trong studio
+  const num = (u, i) => album.files ? i + 1 : parseInt(u.split("/").pop(), 10);
+  return tags.flatMap(tag => { const set = parseRanges(album.tags[tag]); return imgs.filter((u, i) => set.has(num(u, i))); });
+}
+const tagsOf = conceptId => CONCEPTS.find(c => c.id === conceptId).tags;
+function cover(s) {
+  const a = (s.albums || []).find(x => x.folder);
+  if (!a) return Promise.resolve(null);
+  if (!coverCache.has(a.folder)) {
+    const nums = Object.values(a.tags || {}).flatMap(r => [...parseRanges(r)]);
+    coverCache.set(a.folder, a.files || listed(a.folder) ? albumImages(a).then(x => x[0] || null) : probeIndex(a.folder, nums.length ? Math.min(...nums) : 1));
+  }
+  return coverCache.get(a.folder);
+}
+
+/* ---- tiện ích hiển thị ---- */
+function fmtPrice(s) {
+  if (s.priceFrom == null && s.priceTo == null) return null;
+  if (s.priceTo == null || s.priceTo === s.priceFrom) return `${s.priceFrom ?? s.priceTo} triệu`;
+  return `${s.priceFrom ?? "?"} – ${s.priceTo} triệu`;
+}
+const minPrice = s => s.priceFrom ?? s.priceTo ?? null;
+const totalPhotos = s => (s.albums || []).length; // số album hiển thị trên thẻ
+
+/* ---- state & sắp xếp ---- */
+const state = { q: "", sort: "name", style: null, onlyShort: false, cmp: [], view: "grid" };
+const allStyles = [...new Set(STUDIOS.flatMap(s => s.styles || []))];
+const SORT_OPTIONS = [
+  ["name", "Sắp xếp: Tên"],
+  ["priceAsc", "Giá thấp → cao"],
+  ["priceDesc", "Giá cao → thấp"],
+  ["score", "Điểm của tôi"],
+];
+const cmpNum = (a, b, dir) => (a == null) - (b == null) || ((a ?? 0) - (b ?? 0)) * dir;
+function sortList(list) {
+  const price = s => minPrice(s);
+  const out = [...list];
+  if (state.sort === "name") out.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+  if (state.sort === "priceAsc") out.sort((a, b) => cmpNum(price(a), price(b), 1));
+  if (state.sort === "priceDesc") out.sort((a, b) => cmpNum(price(a), price(b), -1));
+  if (state.sort === "score") out.sort((a, b) => cmpNum(avg(a.id), avg(b.id), -1));
+  return out;
+}
+function visible() {
+  const q = state.q.trim().toLowerCase();
+  let list = STUDIOS.filter(s => {
+    if (state.onlyShort && !st(s.id).short) return false;
+    if (state.style && !(s.styles || []).includes(state.style)) return false;
+    if (q) {
+      const hay = [s.name, s.area, s.locations, (s.styles || []).join(" ")].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  return sortList(list);
+}
+
+/* ---- dropdown Sắp xếp (tự dựng) ---- */
+function initSortDD() {
+  const list = $("#sortList");
+  list.innerHTML = SORT_OPTIONS.map(([v, l]) => `<div class="dd-opt ${state.sort === v ? "sel" : ""}" data-v="${v}">${l}</div>`).join("");
+  $("#sortLabel").textContent = SORT_OPTIONS.find(([v]) => v === state.sort)[1];
+}
+$("#sortBtn").addEventListener("click", e => { e.stopPropagation(); $("#sortDD").classList.toggle("open"); });
+$("#sortList").addEventListener("click", e => {
+  const o = e.target.closest(".dd-opt"); if (!o) return;
+  state.sort = o.dataset.v; initSortDD(); $("#sortDD").classList.remove("open");
+  renderGrid(); if (state.view === "compare") renderCompare();
+});
+document.addEventListener("click", () => $("#sortDD").classList.remove("open"));
+
+/* ---- lưới thẻ ---- */
+function renderChips() {
+  $("#chips").innerHTML = allStyles.map(x => `<button type="button" class="chip ${state.style === x ? "on" : ""}" data-style="${esc(x)}">${esc(x)}</button>`).join("");
+}
+function renderGrid() {
+  const list = visible();
+  $("#grid").innerHTML = list.length ? list.map(s => {
+    const sc = avg(s.id), p = fmtPrice(s);
+    const albumsN = totalPhotos(s);
+    const inCmp = state.cmp.includes(s.id);
+    const atCap = !inCmp && state.cmp.length >= MAX_CMP;
+    return `<article class="card" data-id="${s.id}">
+      <div class="cover" data-act="open">
+        <div class="ph ${(s.albums || []).some(a => a.folder) ? "spin" : ""}">${(s.albums || []).some(a => a.folder) ? "" : "Chưa có ảnh mẫu"}</div>
+        <button class="star ${st(s.id).short ? "on" : ""}" data-act="star" title="Thêm vào shortlist">★</button>
+        ${albumsN > 1 ? `<span class="albumcount">${albumsN} bộ ảnh</span>` : ""}
+      </div>
+      <div class="body">
+        <h2 class="name" data-act="open">${esc(s.name)}</h2>
+        <div class="meta">${esc(s.area || "Chưa rõ khu vực")}</div>
+        <div class="tags">${(s.styles || []).map(x => `<span class="tag">${esc(x)}</span>`).join("")}</div>
+        <div class="row">
+          <span class="price">${p ? esc(p) : '<span class="meta">Chưa có giá</span>'}</span>
+          ${sc != null ? `<span class="score">★ ${sc}</span>` : ""}
+        </div>
+        <button type="button" class="cmpBtn ${inCmp ? "on" : ""}" data-act="cmp" ${atCap ? `disabled title="Tối đa ${MAX_CMP} studio"` : ""}>${inCmp ? "✓ Đang so sánh" : "+ Thêm vào so sánh"}</button>
+      </div>
+    </article>`;
+  }).join("") : '<div class="empty"><b>Không có studio nào khớp bộ lọc.</b>Thử bỏ bớt từ khoá hoặc bộ lọc phong cách.</div>';
+  list.forEach(s => cover(s).then(u => {
+    const el = $(`.card[data-id="${s.id}"] .cover`);
+    if (!el) return;
+    if (u) { el.querySelector(".ph")?.remove(); el.insertAdjacentHTML("afterbegin", `<img src="${u}" alt="${esc(s.name)}">`); }
+    else if ((s.albums || []).some(a => a.folder)) { const ph = el.querySelector(".ph"); if (ph) { ph.classList.remove("spin"); ph.textContent = "Chưa tìm thấy ảnh trong thư mục"; } }
+  }));
+  const n = state.cmp.length;
+  $("#cmpBtn").textContent = `So sánh (${n})`;
+  $("#cmpBtn").disabled = n < 2;
+  $("#cmpAllBtn").disabled = list.length < 2;
+}
+
+/* ---- trang chi tiết (vẫn dùng dialog, nhẹ) ---- */
+let curStudio = null;
+function openDetail(id) {
+  const s = STUDIOS.find(x => x.id === id); curStudio = s;
+  const links = [["Website", s.website], ["Facebook", s.facebook], ["Instagram", s.instagram], ["TikTok", s.tiktok]]
+    .filter(x => x[1]).map(([l, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${l} ↗</a>`).join("");
+  const info = [
+    ["Khu vực", s.area], ["Phong cách", (s.styles || []).join(", ")], ["Mức giá", fmtPrice(s)],
+    ["Trang phục", s.outfits], ["Ảnh chỉnh sửa", s.retouched], ["Album / in ấn", s.album],
+    ["Make-up & váy", s.makeup], ["Địa điểm chụp", s.locations], ["Thời gian trả ảnh", s.delivery],
+    ["Đặt cọc", s.deposit], ["Liên hệ", s.contact || s.phone], ["Đánh giá", s.rating]
+  ];
+  const q = st(s.id);
+  $("#detail").innerHTML = `
+    <div class="dhead">
+      <div><h2>${esc(s.name)}</h2><div class="links">${links}</div></div>
+      <button class="x" data-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="dbody">
+      <h3>Thông tin</h3>
+      <table>${info.map(([k, v]) => `<tr><th>${k}</th><td>${t(v)}</td></tr>`).join("")}</table>
+      ${(s.packages || []).length ? `<h3>Các gói chụp</h3>${packagesBlock(s)}` : ""}
+      <h3>Ảnh mẫu</h3>
+      <div class="tabs" id="albumTabs"></div>
+      <div class="gallery" id="gallery"></div>
+      <h3>Đánh giá của tôi</h3>
+      <div class="rate" id="rate"></div>
+      <h3>Ghi chú</h3>
+      <textarea id="notes" placeholder="Cảm nhận khi nhắn tin tư vấn, ưu / nhược điểm, câu hỏi cần hỏi thêm...">${esc(q.notes)}</textarea>
+    </div>`;
+  renderRate();
+  $("#notes").addEventListener("input", e => { st(s.id).notes = e.target.value; save(); });
+  const albums = (s.albums || []).filter(a => a.folder);
+  $("#albumTabs").innerHTML = albums.length > 1 ? albums.map((a, i) => {
+    // icon theo concept chiếm nhiều ảnh nhất trong bộ
+    const count = c => c.tags.reduce((n, x) => n + parseRanges(a.tags?.[x]).size, 0);
+    const c = a.tags ? [...CONCEPTS].sort((x, y) => count(y) - count(x))[0] : null;
+    return `<button class="chip ${i ? "" : "on"}" data-album="${i}" title="${esc(a.name)}">${c ? c.icon + " " : ""}Bộ ảnh ${i + 1}</button>`;
+  }).join("") : "";
+  showAlbum(albums, 0);
+  $("#albumTabs").onclick = e => {
+    const b = e.target.closest("[data-album]"); if (!b) return;
+    $("#albumTabs").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
+    showAlbum(albums, +b.dataset.album);
+  };
+  $("#detail").showModal();
+}
+async function showAlbum(albums, i) {
+  const g = $("#gallery");
+  if (!albums.length) { g.innerHTML = '<p class="note">Chưa có ảnh. Dùng extension tải ảnh album, rồi khai báo thư mục trong phần albums của studio này.</p>'; return; }
+  g.innerHTML = '<p class="note">Đang tải ảnh...</p>';
+  const imgs = await albumImages(albums[i]);
+  if (!imgs.length) { g.innerHTML = `<p class="note">Không thấy ảnh trong thư mục <code>${esc(albums[i].folder)}</code>. Kiểm tra lại tên thư mục.</p>`; return; }
+  g.innerHTML = imgs.map((u, k) => `<img src="${u}" loading="lazy" data-k="${k}" alt="">`).join("");
+  g.onclick = e => { const im = e.target.closest("img"); if (im) openLightbox(imgs, +im.dataset.k); };
+}
+function renderRate() {
+  const q = st(curStudio.id);
+  $("#rate").innerHTML = CRIT.map(c => `<div>${c}</div><div>${[1, 2, 3, 4, 5].map(v => `<button data-crit="${esc(c)}" data-v="${v}" class="${(q.r[c] || 0) >= v ? "on" : ""}">★</button>`).join("")}</div>`).join("")
+    + `<div><b>Điểm trung bình</b></div><div><b>${avg(curStudio.id) ?? "—"}</b></div>`;
+}
+
+/* ================= TRANG SO SÁNH (toàn trang, không phải popup) ================= */
+function setView(v) {
+  state.view = v;
+  document.body.classList.toggle("view-grid", v === "grid");
+  document.body.classList.toggle("view-compare", v === "compare");
+  $("#cmpBarBack").style.display = v === "compare" ? "flex" : "none";
+  if (v === "compare") { window.scrollTo(0, 0); renderCompare(); }
+}
+$("#backBtn").addEventListener("click", () => setView("grid"));
+
+function compareRows(list) {
+  const rows = [
+    ["Mức giá", s => t(fmtPrice(s)), s => fmtPrice(s) ?? ""],
+    ["Các gói", s => packagesBlock(s), s => JSON.stringify(s.packages || [])],
+    ["Khu vực", s => t(s.area), s => s.area],
+    ["Phong cách", s => t((s.styles || []).join(", ")), s => (s.styles || []).join(",")],
+    ["Trang phục", s => t(s.outfits), s => s.outfits],
+    ["Ảnh chỉnh sửa", s => t(s.retouched), s => s.retouched],
+    ["Album / in ấn", s => t(s.album), s => s.album],
+    ["Make-up & váy", s => t(s.makeup), s => s.makeup],
+    ["Địa điểm chụp", s => t(s.locations), s => s.locations],
+    ["Thời gian trả ảnh", s => t(s.delivery), s => s.delivery],
+    ["Đặt cọc", s => t(s.deposit), s => s.deposit],
+    ["Liên hệ", s => t(s.contact || s.phone), s => s.contact || s.phone],
+    ["Đánh giá", s => t(s.rating), s => s.rating],
+    ["Điểm của tôi", s => t(avg(s.id)), s => avg(s.id) ?? ""],
+  ];
+  const prices = list.map(minPrice);
+  const validPrices = prices.filter(p => p != null);
+  const cheapest = validPrices.length ? Math.min(...validPrices) : null;
+  const cheapestUnique = cheapest != null && prices.filter(p => p === cheapest).length === 1;
+  return { rows, prices, cheapest, cheapestUnique };
+}
+
+function renderCompare() {
+  const list = sortList(state.cmp.map(id => STUDIOS.find(s => s.id === id)).filter(Boolean));
+  const root = $("#compareView");
+  if (list.length < 2) {
+    root.innerHTML = `<div class="empty"><b>Chọn ít nhất 2 studio để so sánh.</b>Quay lại danh sách và bấm "Thêm vào so sánh" ở các thẻ studio.</div>`;
+    return;
+  }
+  const { rows, prices, cheapest, cheapestUnique } = compareRows(list);
+
+  const header = `<tr>
+      <th class="corner"></th>
+      ${list.map(s => `<th class="studio-col">
+        <div class="cmp-shead-top">
+          <h3 class="cmp-sname">${esc(s.name)}</h3>
+          <button type="button" class="cmp-x" data-remove="${s.id}" title="Bỏ khỏi so sánh">✕</button>
+        </div>
+      </th>`).join("")}
+      <th class="addcol"><button type="button" class="addcol-btn" id="addMoreBtn">+ Thêm studio</button></th>
+    </tr>`;
+
+  const photoRows = CONCEPTS.map(c => `<tr>
+      <th class="rowlabel">
+        <div class="rowlabel-flex">
+          <span>${c.icon} ${c.label}</span>
+          <button type="button" class="pf-open" data-concept="${c.id}" title="Phóng to so sánh ${c.label.toLowerCase()}">⛶</button>
+        </div>
+      </th>
+      ${list.map(s => `<td class="studio-col" data-gal="${s.id}|${c.id}">${galleryShell(s, c.id)}</td>`).join("")}
+      <td></td>
+    </tr>`).join("");
+
+  const attrRows = rows.map(([label, cell]) => {
+    return `<tr>
+      <th class="rowlabel">${label}</th>
+      ${list.map((s, i) => `<td class="studio-col ${label === "Mức giá" && cheapestUnique && prices[i] === cheapest ? "best" : ""}">${cell(s)}</td>`).join("")}
+      <td></td>
+    </tr>`;
+  }).join("");
+
+  root.innerHTML = `
+    <div class="cmp-topbar">
+      <h2>So sánh ${list.length} studio</h2>
+      <span class="cmp-hint">Kéo ngang để xem thêm studio · Ảnh được gom theo 3 nhóm: 🏠 trong studio, 🌳 ngoại cảnh và 👘 áo dài</span>
+    </div>
+    <div class="cmp-scroll">
+      <table class="cmp-table">
+        <thead>${header}</thead>
+        <tbody>${photoRows}${attrRows}</tbody>
+      </table>
+    </div>`;
+
+  // nạp ảnh cho từng cột, theo từng nhóm concept (độc lập, song song)
+  list.forEach(s => CONCEPTS.forEach(c => mountGallery(root.querySelector(`[data-gal="${s.id}|${c.id}"]`), s, c.id)));
+  fitCompareScroll();
+}
+
+/* ---- giới hạn chiều cao khung bảng so sánh theo màn hình, để dòng tên studio (thead) luôn đứng yên khi cuộn trong bảng ---- */
+function fitCompareScroll() {
+  const el = $(".cmp-scroll");
+  if (!el) return;
+  requestAnimationFrame(() => {
+    const top = el.getBoundingClientRect().top;
+    el.style.maxHeight = `calc(100vh - ${Math.round(top)}px - 18px)`;
+  });
+}
+window.addEventListener("resize", () => { if (state.view === "compare") fitCompareScroll(); });
+
+/* ---- gallery dạng "ảnh lớn + dải ảnh nhỏ", mỗi cột studio một bản độc lập ---- */
+/* ---- khối "Các gói chụp": tab chọn gói + gạch đầu dòng quyền lợi, dùng chung cho trang chi tiết & bảng so sánh ---- */
+function packagesBlock(s) {
+  const pkgs = s.packages || [];
+  if (!pkgs.length) return `<span class="note">Chưa có thông tin gói.</span>`;
+  return `<div class="pkgblock">
+    ${pkgs.length > 1 ? `<div class="palbums pkg-tabs">${pkgs.map((p, i) => `<button type="button" class="chip mini ${i ? "" : "on"}" data-pi="${i}">${esc(p.name)}</button>`).join("")}</div>` : ""}
+    ${pkgs.map((p, i) => `<div class="pkg-pane ${i ? "" : "on"}" data-pi="${i}">
+      <div class="pkg-price">${esc(p.name)} · ${esc(p.price)} triệu</div>
+      ${p.includes ? `<ul class="pkg-list">${p.includes.split("·").map(x => x.trim()).filter(Boolean).map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="note">Chưa có chi tiết.</p>`}
+    </div>`).join("")}
+  </div>`;
+}
+function galleryShell(s, conceptId) {
+  const albums = albumsFor(s, tagsOf(conceptId));
+  if (!albums.length) return `<p class="note">Chưa có ảnh ở nhóm này.</p>`;
+  return `
+    ${albums.length > 1 ? `<div class="palbums">${albums.map((a, i) => `<button type="button" class="chip mini ${i ? "" : "on"}" data-ai="${i}" title="${esc(a.name)}">Bộ ${i + 1}</button>`).join("")}</div>` : ""}
+    <div class="phero"><div class="ph spin"></div></div>
+    <div class="pthumbs"></div>
+    <div class="pcount"></div>`;
+}
+function mountGallery(cell, s, conceptId) {
+  if (!cell) return;
+  const tags = tagsOf(conceptId);
+  const albums = albumsFor(s, tags);
+  if (!albums.length) return;
+  const local = { ai: 0, pi: 0, imgs: [] };
+  const hero = cell.querySelector(".phero"), thumbs = cell.querySelector(".pthumbs"), count = cell.querySelector(".pcount");
+
+  function showHero() {
+    const u = local.imgs[local.pi];
+    hero.innerHTML = u ? `<img src="${u}" alt="">` : `<div class="note" style="padding:14px">Không thấy ảnh</div>`;
+    thumbs.querySelectorAll("img").forEach((im, k) => im.classList.toggle("on", k === local.pi));
+    count.textContent = local.imgs.length ? `Ảnh ${local.pi + 1}/${local.imgs.length}` : "";
+  }
+  async function loadAlbum(ai) {
+    local.ai = ai; local.pi = 0;
+    hero.innerHTML = `<div class="ph spin"></div>`;
+    thumbs.innerHTML = ""; count.textContent = "Đang tải...";
+    const imgs = await albumPhotos(albums[ai], tags);
+    if (ai !== local.ai) return; // đã bấm sang bộ khác trong lúc tải
+    local.imgs = imgs;
+    if (!imgs.length) { hero.innerHTML = `<div class="note" style="padding:14px">Không thấy ảnh trong thư mục <code>${esc(albums[ai].folder)}</code></div>`; count.textContent = ""; return; }
+    thumbs.innerHTML = imgs.map((u, k) => `<img src="${u}" loading="lazy" decoding="async" data-k="${k}" alt="">`).join("");
+    showHero();
+  }
+  cell.addEventListener("click", e => {
+    const tab = e.target.closest("[data-ai]");
+    if (tab) { cell.querySelectorAll(".palbums .chip").forEach(c => c.classList.toggle("on", c === tab)); loadAlbum(+tab.dataset.ai); return; }
+    const th = e.target.closest(".pthumbs img");
+    if (th) { local.pi = +th.dataset.k; showHero(); return; }
+    if (e.target.closest(".phero img")) openLightbox(local.imgs, local.pi);
+  });
+  loadAlbum(0);
+}
+
+/* ---- popup phóng to so sánh ảnh: tập trung vào các dòng concept, hiện nhiều ảnh dạng lưới thay vì slide từng ảnh ---- */
+function openPhotoFocus(focusConcept) {
+  const list = sortList(state.cmp.map(id => STUDIOS.find(s => s.id === id)).filter(Boolean));
+  if (list.length < 2) return;
+  $("#pfTitle").textContent = `So sánh ảnh theo concept · ${list.length} studio`;
+  $("#pfBody").innerHTML = CONCEPTS.map(c => `
+    <div class="pf-group" data-concept="${c.id}">
+      <h3>${c.icon} ${c.label}</h3>
+      <div class="pf-cols">
+        ${list.map(s => `<div class="pf-col" data-pfcol="${s.id}|${c.id}">
+          <h4>${esc(s.name)}</h4>
+          <div class="pf-grid"><span class="note">Đang tải...</span></div>
+        </div>`).join("")}
+      </div>
+    </div>`).join("");
+  list.forEach(s => CONCEPTS.forEach(c => loadFocusCol(s, c.id)));
+  $("#photoFocus").showModal();
+  if (focusConcept) {
+    const sec = $(`.pf-group[data-concept="${focusConcept}"]`);
+    if (sec) sec.scrollIntoView({ block: "start" });
+  }
+}
+async function loadFocusCol(s, conceptId) {
+  const col = $(`.pf-col[data-pfcol="${s.id}|${conceptId}"]`);
+  if (!col) return;
+  const grid = col.querySelector(".pf-grid");
+  const tags = tagsOf(conceptId);
+  const albums = albumsFor(s, tags);
+  if (!albums.length) { grid.innerHTML = `<div class="pf-empty">Chưa có ảnh ở nhóm này.</div>`; return; }
+  const sets = await Promise.all(albums.map(a => albumPhotos(a, tags)));
+  const imgs = sets.flat();
+  if (!imgs.length) { grid.innerHTML = `<div class="pf-empty">Không thấy ảnh trong thư mục.</div>`; return; }
+  grid.innerHTML = imgs.map((u, k) => `<img src="${u}" loading="lazy" data-k="${k}" alt="">`).join("");
+  grid.onclick = e => { const im = e.target.closest("img"); if (im) openLightbox(imgs, +im.dataset.k); };
+}
+$("#pfClose").addEventListener("click", () => $("#photoFocus").close());
+$("#photoFocus").addEventListener("click", e => { if (e.target === $("#photoFocus")) $("#photoFocus").close(); });
+
+/* ---- xem ảnh toàn màn hình ---- */
+let lbList = [], lbI = 0;
+function openLightbox(list, i) { lbList = list; lbI = i; drawLb(); if (!$("#lb").open) $("#lb").showModal(); }
+function drawLb() { $("#lbImg").src = lbList[lbI]; $("#lbCount").textContent = `${lbI + 1} / ${lbList.length}`; }
+const lbStep = d => { lbI = (lbI + d + lbList.length) % lbList.length; drawLb(); };
+$("#lbPrev").onclick = () => lbStep(-1);
+$("#lbNext").onclick = () => lbStep(1);
+$("#lbClose").onclick = () => $("#lb").close();
+$("#lb").addEventListener("keydown", e => { if (e.key === "ArrowLeft") lbStep(-1); if (e.key === "ArrowRight") lbStep(1); });
+$("#lb").addEventListener("click", e => { if (e.target === $("#lb") || e.target.classList.contains("stage")) $("#lb").close(); });
+
+/* ---- sự kiện chung ---- */
+$("#q").addEventListener("input", e => { state.q = e.target.value; renderGrid(); });
+$("#onlyShort").addEventListener("click", () => { state.onlyShort = !state.onlyShort; $("#onlyShort").classList.toggle("on", state.onlyShort); renderGrid(); });
+$("#chips").addEventListener("click", e => {
+  const b = e.target.closest("[data-style]"); if (!b) return;
+  state.style = state.style === b.dataset.style ? null : b.dataset.style;
+  renderChips(); renderGrid();
+});
+$("#grid").addEventListener("click", e => {
+  const card = e.target.closest(".card"); if (!card) return;
+  const id = card.dataset.id, act = e.target.closest("[data-act]")?.dataset.act;
+  if (act === "open") openDetail(id);
+  if (act === "star") { st(id).short = !st(id).short; save(); renderGrid(); }
+  if (act === "cmp") {
+    if (state.cmp.includes(id)) state.cmp = state.cmp.filter(x => x !== id);
+    else if (state.cmp.length < MAX_CMP) state.cmp.push(id);
+    renderGrid();
+  }
+});
+$("#cmpBtn").addEventListener("click", () => setView("compare"));
+$("#cmpAllBtn").addEventListener("click", () => {
+  state.cmp = visible().map(s => s.id).slice(0, MAX_CMP);
+  renderGrid();
+  setView("compare");
+});
+$("#detail").addEventListener("click", e => {
+  if (e.target.closest("[data-close]") || e.target === $("#detail")) return $("#detail").close();
+  const pt = e.target.closest(".pkg-tabs [data-pi]");
+  if (pt) { switchPkgTab(pt); return; }
+  const b = e.target.closest("[data-crit]");
+  if (b) {
+    const q = st(curStudio.id), v = +b.dataset.v;
+    q.r[b.dataset.crit] = q.r[b.dataset.crit] === v ? 0 : v; save(); renderRate();
+  }
+});
+$("#detail").addEventListener("close", renderGrid);
+
+function switchPkgTab(tab) {
+  const block = tab.closest(".pkgblock");
+  block.querySelectorAll(".pkg-tabs .chip").forEach(c => c.classList.toggle("on", c === tab));
+  block.querySelectorAll(".pkg-pane").forEach(p => p.classList.toggle("on", p.dataset.pi === tab.dataset.pi));
+}
+$("#compareView").addEventListener("click", e => {
+  const pf = e.target.closest(".pf-open");
+  if (pf) { openPhotoFocus(pf.dataset.concept); return; }
+  const pt = e.target.closest(".pkg-tabs [data-pi]");
+  if (pt) { switchPkgTab(pt); return; }
+  const rm = e.target.closest("[data-remove]");
+  if (rm) { state.cmp = state.cmp.filter(id => id !== rm.dataset.remove); renderGrid(); renderCompare(); return; }
+  if (e.target.closest("#addMoreBtn")) setView("grid");
+});
+
+initSortDD();
+renderChips();
+renderGrid();
+</script>
+</body>
+</html>

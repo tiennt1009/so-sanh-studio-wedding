@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Tải ảnh album",
+  "version": "1.6",
+  "description": "Cuộn hết trang, gom các ảnh lớn của album và tải về một thư mục.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Tải ảnh album"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
