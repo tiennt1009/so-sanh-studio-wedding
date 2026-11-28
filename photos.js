@@ -690,14 +690,73 @@ window.PHOTO_FILES = {
   "743925023_990689990639459_6978753799570180478_n.jpg",
   "744042136_1196149352654418_193086049566013233_n.jpg"
  ],
- "hani-wedding-studio/concept 2": [
-  "1795587984944_2217018644394276793_5971953401402466205_bcca51992927e10c09a0f429bd43ef0b.jpg",
-  "1795587985043_2217018644394276793_5971953401402466205_33a4a0c0b34c37e9fac761f31737815a.jpg",
-  "1795587985157_2217018644394276793_5971953401402466205_ed8ecd76b9a46bb06bdd784a887df429.jpg"
- ],
  "rose-studio/concept 1": [
   "762997939_37275834312063751_3089942456153667998_n.jpg",
   "763353930_1064678659492585_4739165305653028068_n.jpg",
   "763654143_1386581750075997_2574589755278176077_n.jpg"
+ ],
+ "hani-wedding-studio/ethereal-soulmate-f-w-26-mot-khoi-dau-day": [
+  "02.jpg",
+  "03.jpg",
+  "04.jpg",
+  "05.jpg",
+  "06.jpg",
+  "07.jpg",
+  "08.jpg",
+  "09.jpg",
+  "10.jpg",
+  "11.jpg",
+  "12.jpg",
+  "13.jpg",
+  "14.jpg",
+  "15.jpg"
+ ],
+ "aman-wedding/su-mem-mai": [
+  "02.jpg",
+  "03.jpg",
+  "04.jpg",
+  "05.jpg",
+  "06.jpg",
+  "07.jpg",
+  "08.jpg",
+  "09.jpg",
+  "10.jpg",
+  "11.jpg"
+ ],
+ "aman-wedding/mot-bo-anh-cuoi-khong-bao-gio-loi": [
+  "01.jpg",
+  "02.jpg",
+  "03.jpg",
+  "04.jpg",
+  "05.jpg",
+  "06.jpg"
+ ],
+ "aman-wedding/khi-tinh-yeu-hoa-thanh-nhung-dieu-tho-mong-duoi": [
+  "02.jpg",
+  "03.jpg",
+  "04.jpg",
+  "05.jpg",
+  "06.jpg",
+  "07.jpg",
+  "08.jpg",
+  "09.jpg",
+  "10.jpg",
+  "11.jpg",
+  "12.jpg",
+  "13.jpg",
+  "14.jpg",
+  "15.jpg",
+  "16.jpg"
+ ],
+ "aman-wedding/mot-concept-moi-hua-hen-lam-mua-lam-gio-mua-cuoi": [
+  "02.jpg",
+  "03.jpg",
+  "04.jpg",
+  "05.jpg",
+  "06.jpg",
+  "07.jpg",
+  "08.jpg",
+  "09.jpg",
+  "10.jpg"
  ]
 };
