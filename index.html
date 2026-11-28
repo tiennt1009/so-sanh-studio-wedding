@@ -103,11 +103,14 @@
   body.view-grid #gridControls { display: flex; }
   body.view-compare #compareView { display: block; }
 
-  .cmp-topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+  /* trang So sánh dùng hết chiều ngang màn hình */
+  body.view-compare main { max-width: none; padding: 16px 0 0; }
+
+  .cmp-topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; padding: 0 24px; }
   .cmp-topbar h2 { margin: 0; font-size: 22px; }
   .cmp-hint { color: var(--muted); font-size: 13px; }
 
-  .cmp-scroll { overflow-x: auto; overflow-y: auto; border: 1px solid var(--line); border-radius: 18px; background: #fff; -webkit-overflow-scrolling: touch; }
+  .cmp-scroll { overflow-x: auto; overflow-y: auto; border-top: 1px solid var(--line); background: #fff; -webkit-overflow-scrolling: touch; }
   table.cmp-table { overflow: visible; border-radius: 0; border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
   .cmp-table th, .cmp-table td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); padding: 13px 15px; vertical-align: top; text-align: left; font-size: 14px; background: #fff; }
   .cmp-table tr > :last-child { border-right: 0; }
@@ -121,8 +124,8 @@
   .cmp-table tbody tr:nth-child(odd) > td.studio-col { background: #fff; }
   .cmp-table tbody tr:nth-child(even) > td.studio-col { background: #faf6f1; }
   .cmp-table td.best { background: var(--good-soft) !important; color: var(--good); font-weight: 700; }
-  .cmp-table th.addcol { min-width: 160px; background: #fbf7f3; text-align: center; vertical-align: middle; }
-  .addcol-btn { border: 1.5px dashed var(--line); background: #fff; border-radius: 12px; padding: 14px 10px; width: 100%; color: var(--muted); font-size: 13px; }
+  .cmp-table th.addcol { width: 100%; min-width: 160px; background: #fbf7f3; text-align: left; vertical-align: middle; } /* cột cuối nhận hết phần thừa, để cột studio không bị kéo giãn */
+  .addcol-btn { border: 1.5px dashed var(--line); background: #fff; border-radius: 12px; padding: 14px 10px; width: 100%; max-width: 180px; color: var(--muted); font-size: 13px; }
   .addcol-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   .cmp-sname { font-size: 16px; font-weight: 700; margin: 0 0 3px; }
@@ -180,6 +183,7 @@
     .dhead, .dbody { padding-left: 16px; padding-right: 16px; }
     .rate { grid-template-columns: 1fr; }
     .cmp-studio { padding: 18px; }
+    .cmp-topbar { padding: 0 14px; }
   }
 </style>
 </head>
@@ -821,7 +825,7 @@ function fitCompareScroll() {
   if (!el) return;
   requestAnimationFrame(() => {
     const top = el.getBoundingClientRect().top;
-    el.style.maxHeight = `calc(100vh - ${Math.round(top)}px - 18px)`;
+    el.style.maxHeight = `calc(100vh - ${Math.round(top)}px)`;
   });
 }
 window.addEventListener("resize", () => { if (state.view === "compare") fitCompareScroll(); });
